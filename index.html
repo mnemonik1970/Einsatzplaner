@@ -3,52 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FFW Einsatzplaner Pro | Hybrid-Modus</title>
+    <title>FFW Einsatzplaner | Funktions-Statistik</title>
     <style>
-        :root { 
-            --fire: #c0392b; --thl: #2980b9; --dark: #2c3e50; --bg: #f4f7f6; 
-            --accent: #e67e22; --disabled: #95a5a6; --success: #27ae60; 
-        }
+        :root { --fire: #c0392b; --thl: #2980b9; --dark: #2c3e50; --bg: #f4f7f6; --accent: #e67e22; --success: #27ae60; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
-        
-        /* Modus-abhängiges Design */
         body.mode-thl { --current-theme: var(--thl); }
         body.mode-brand { --current-theme: var(--fire); }
-
-        .sidebar { width: 750px; background: var(--dark); color: white; padding: 20px; overflow-y: auto; border-right: 5px solid var(--current-theme); transition: 0.3s; }
-        
+        .sidebar { width: 750px; background: var(--dark); color: white; padding: 20px; overflow-y: auto; border-right: 5px solid var(--current-theme); }
         .mode-switch { display: flex; gap: 10px; margin-bottom: 20px; background: #34495e; padding: 5px; border-radius: 8px; }
-        .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; background: transparent; }
-        .mode-btn.active { background: var(--current-theme); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-
-        .select-all-btn { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #555; background: #34495e; color: white; cursor: pointer; font-weight: bold; }
-
-        #checkliste { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .member { display: flex; flex-direction: column; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; min-height: 85px; justify-content: space-between; }
+        .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; background: transparent; }
+        .mode-btn.active { background: var(--current-theme); }
+        #checkliste { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .member { display: flex; flex-direction: column; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; min-height: 110px; justify-content: space-between; transition: 0.2s; }
         .member.selected { background: rgba(39, 174, 96, 0.3); border-color: var(--success); }
-        .member b { font-size: 0.85em; color: white; }
         
-        .badge-small { display: inline-block; padding: 1px 5px; border-radius: 3px; margin-right: 4px; margin-bottom: 4px; font-weight: bold; font-size: 0.85em; }
-        .b-zf { background: #e74c3c; color: white; }
-        .b-gf { background: #e67e22; color: white; }
-        .b-ma { background: #f1c40f; color: black; }
-        .b-agt { background: #2ecc71; color: white; }
-        .b-tf { background: #3498db; color: white; }
+        /* Container für Badges + Zahlen */
+        .badge-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .stat-box { display: flex; flex-direction: column; align-items: center; min-width: 32px; }
+        .badge-small { padding: 1px 5px; border-radius: 3px; font-weight: bold; font-size: 0.75em; display: block; width: 100%; text-align: center; }
+        .stat-val { font-size: 0.7em; opacity: 0.8; margin-top: 2px; font-weight: bold; }
+        
+        .b-zf { background: #e74c3c; } .b-gf { background: #e67e22; } .b-ma { background: #f1c40f; color: black; } .b-agt { background: #2ecc71; } .b-tf { background: #3498db; }
+        
         .count-badge { align-self: flex-end; background: var(--current-theme); color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.75em; font-weight: bold; }
-
         .main { flex: 1; padding: 20px; overflow-y: auto; }
         .status-bar { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .fz-toggle { padding: 8px 12px; border-radius: 4px; cursor: pointer; border: 2px solid var(--current-theme); font-weight: bold; background: white; color: var(--current-theme); }
         .fz-toggle.active { background: var(--current-theme); color: white; }
-
-        .action-btns { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-        button#run { background: var(--success); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: bold; }
-        button#saveBtn { background: var(--thl); color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; display: none; font-weight: bold; }
-
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; }
         .vehicle { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-top: 6px solid var(--current-theme); }
+        .vehicle h2 { font-size: 1.2em; margin: 0 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .role { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.9em; }
-        .warn { color: var(--accent) !important; font-style: italic; font-weight: bold; }
+        .warn { color: #e74c3c !important; font-weight: bold; }
+        @media (max-width: 1100px) { body { flex-direction: column; height: auto; overflow: auto; } .sidebar { width: 100%; } #checkliste { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body class="mode-brand">
@@ -59,32 +46,27 @@
         <button class="mode-btn" id="btnTHL" onclick="setMode('thl')">🛠 THL</button>
     </div>
     <h2>👨‍🚒 Mannschaft</h2>
-    <button class="select-all-btn" id="btnToggleAll" onclick="toggleAll()">✅ Alle auswählen</button>
+    <button onclick="toggleAll()" style="width:100%; padding:10px; margin-bottom:15px; border-radius:4px; border:1px solid #555; background:#34495e; color:white; cursor:pointer; font-weight:bold;">✅ Alle auswählen</button>
     <div id="checkliste">Lade Daten...</div>
 </div>
 
 <div class="main">
     <div id="statusBar" class="status-bar"></div>
-    <div class="action-btns">
-        <button id="run" onclick="verteileMannschaft()">🚀 Personal taktisch verteilen</button>
-        <button id="saveBtn" onclick="speichereUebung()">💾 Übungsteilnahme speichern</button>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+        <button onclick="verteileMannschaft()" style="background:var(--success); color:white; border:none; padding:15px; border-radius:8px; cursor:pointer; font-size:1.1em; font-weight:bold;">🚀 Personal taktisch verteilen</button>
+        <button id="saveBtn" onclick="speichereUebung()" style="background:var(--thl); color:white; border:none; padding:15px; border-radius:8px; cursor:pointer; display:none; font-weight:bold;">💾 Funktionsbezogen speichern</button>
     </div>
     <div id="anzeige" class="grid"></div>
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxNldvB7VMGoa9CVQtZ-5qyRzxmE07U1Zd0V0szAyvDkVcuBBMu_SmuwX3ZsKNyo8iNDA/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbxHNwXCXO9zPJ1sYUfHDRipH8Q4oLbculKyh9e5R2BGGIf2v1kkEhTmQV90yjHitOdcRw/exec";
 let mannschaft = [];
-let allSelected = false;
+let fahrzeuge = [];
 let currentMode = 'brand';
+let aktuellesErgebnis = {};
 
-const fahrzeuge = [
-    { id: 3, name: "MTW (ELW)", minFS: "B", active: true, slots: ["Zugführer", "Maschinist", "GF"] },
-    { id: 0, name: "MLF", minFS: "C1", active: true, slots: ["GF", "MA", "ATF", "ATM", "WTF", "WTM"] },
-    { id: 1, name: "LF 16/12", minFS: "C", active: true, slots: ["GF", "MA", "ATF", "ATM", "WTF", "WTM", "STF", "STM", "Melder"] },
-    { id: 2, name: "GW-T", minFS: "C", active: true, slots: ["Staffelführer", "MA", "Trupp 1", "Trupp 2", "Trupp 3", "Trupp 4"] }
-];
-
+const isTrue = (val) => val === true || val === "True" || val === "TRUE";
 
 function setMode(mode) {
     currentMode = mode;
@@ -98,7 +80,8 @@ async function ladeDaten() {
     try {
         const res = await fetch(scriptURL);
         const data = await res.json();
-        mannschaft = data.sort((a, b) => a.name.split(" ").slice(-1)[0].localeCompare(b.name.split(" ").slice(-1)[0]));
+        mannschaft = data.mannschaft.sort((a, b) => a.nachname.localeCompare(b.nachname));
+        fahrzeuge = data.fahrzeuge;
         zeichneCheckliste();
         zeichneStatusBar();
     } catch (e) { document.getElementById('checkliste').innerHTML = "Fehler!"; }
@@ -109,9 +92,9 @@ function zeichneStatusBar() {
     bar.innerHTML = "";
     fahrzeuge.forEach(fz => {
         const btn = document.createElement('div');
-        btn.className = `fz-toggle ${fz.active ? 'active' : 'inactive'}`;
+        btn.className = `fz-toggle ${isTrue(fz.active) ? 'active' : 'inactive'}`;
         btn.innerText = fz.name;
-        btn.onclick = () => { fz.active = !fz.active; zeichneStatusBar(); };
+        btn.onclick = () => { fz.active = !isTrue(fz.active); zeichneStatusBar(); };
         bar.appendChild(btn);
     });
 }
@@ -120,24 +103,25 @@ function zeichneCheckliste() {
     const list = document.getElementById('checkliste');
     list.innerHTML = "";
     mannschaft.forEach((k, i) => {
-        let badges = "";
-        if(k.zf) badges += `<span class="badge-small b-zf">ZF</span> `;
-        if(k.gf) badges += `<span class="badge-small b-gf">GF</span> `;
-        if(k.ma) badges += `<span class="badge-small b-ma">MA</span> `;
-        if(k.agt) badges += `<span class="badge-small b-agt">AGT</span> `;
-        if(k.tf) badges += `<span class="badge-small b-tf">TF</span> `;
+        let badgeHtml = `<div class="badge-container">`;
+        
+        if(isTrue(k.zf)) badgeHtml += `<div class="stat-box"><span class="badge-small b-zf">ZF</span><span class="stat-val">${k.count_zf || 0}</span></div>`;
+        if(isTrue(k.gf)) badgeHtml += `<div class="stat-box"><span class="badge-small b-gf">GF</span><span class="stat-val">${k.count_gf || 0}</span></div>`;
+        if(isTrue(k.ma)) badgeHtml += `<div class="stat-box"><span class="badge-small b-ma">MA</span><span class="stat-val">${k.count_ma || 0}</span></div>`;
+        if(isTrue(k.agt)) badgeHtml += `<div class="stat-box"><span class="badge-small b-agt">AGT</span><span class="stat-val">${k.count_agt || 0}</span></div>`;
+        if(isTrue(k.tf)) badgeHtml += `<div class="stat-box"><span class="badge-small b-tf">TF</span><span class="stat-val">-</span></div>`;
+        
+        badgeHtml += `</div>`;
 
-        list.innerHTML += `
-            <div class="member" onclick="toggleMember(${i}, this)" id="mem-${i}">
-                <div style="pointer-events:none">
-                    <div style="display:flex; align-items:flex-start">
-                        <input type="checkbox" id="cb-${i}" data-idx="${i}">
-                        <b>${k.name}</b>
-                    </div>
-                    <div style="margin-top:5px">${badges}</div>
-                </div>
-                <div class="count-badge">${k.count || 0}</div>
-            </div>`;
+        let gesamtCount = (parseInt(k.count_zf)||0) + (parseInt(k.count_gf)||0) + (parseInt(k.count_ma)||0) + (parseInt(k.count_agt)||0) + (parseInt(k.count_sonstige)||0);
+
+        list.innerHTML += `<div class="member" onclick="toggleMember(${i}, this)" id="mem-${i}">
+            <div style="pointer-events:none">
+                <div style="display:flex; align-items:flex-start"><input type="checkbox" id="cb-${i}" data-idx="${i}"><b>${k.fulldisplayname}</b></div>
+                ${badgeHtml}
+            </div>
+            <div class="count-badge">${gesamtCount}</div>
+        </div>`;
     });
 }
 
@@ -148,12 +132,11 @@ function toggleMember(idx, element) {
 }
 
 function toggleAll() {
-    allSelected = !allSelected;
-    mannschaft.forEach((_, i) => {
-        const cb = document.getElementById(`cb-${i}`);
-        const div = document.getElementById(`mem-${i}`);
-        cb.checked = allSelected;
-        div.classList.toggle('selected', allSelected);
+    const all = document.querySelectorAll('#checkliste input');
+    const newState = !all[0].checked;
+    all.forEach((cb, i) => {
+        cb.checked = newState;
+        document.getElementById(`mem-${i}`).classList.toggle('selected', newState);
     });
 }
 
@@ -163,63 +146,89 @@ function verteileMannschaft() {
         pool.push({...mannschaft[cb.getAttribute('data-idx')]});
     });
     
-    // Sortierung: Bei THL ist AGT fast egal (Gewichtung reduziert)
+    if(pool.length === 0) return alert("Kein Personal gewählt!");
+    pool = pool.sort(() => Math.random() - 0.5);
+    
+    // Sortierung nach Gesamt-Teilnahme für faire Verteilung
     pool.sort((a, b) => {
-        const score = (p) => (p.zf?100:0)+(p.gf?50:0)+(p.ma?30:0)+(p.tf?10:0)+(currentMode==='brand'&&p.agt?20:0);
-        return score(b) - score(a);
+        let cA = (parseInt(a.count_zf)||0) + (parseInt(a.count_gf)||0) + (parseInt(a.count_ma)||0) + (parseInt(a.count_agt)||0) + (parseInt(a.count_sonstige)||0);
+        let cB = (parseInt(b.count_zf)||0) + (parseInt(b.count_gf)||0) + (parseInt(b.count_ma)||0) + (parseInt(b.count_agt)||0) + (parseInt(b.count_sonstige)||0);
+        return cA - cB;
     });
 
     const anzeige = document.getElementById('anzeige');
     anzeige.innerHTML = "";
     let ergebnis = {};
-    const aktiveFahrzeuge = fahrzeuge.filter(fz => fz.active);
+    const aktiveFahrzeuge = fahrzeuge.filter(fz => isTrue(fz.active));
 
-    const findPerson = (q, p) => { let i = p.findIndex(x => x[q]); return i !== -1 ? p.splice(i, 1)[0].name : null; };
-    const findMA = (fs, p) => {
-        const h = { "B": ["B", "C1", "C"], "C1": ["C1", "C"], "C": ["C"] };
-        let i = p.findIndex(x => x.ma && h[fs].includes(x.fs));
-        return i !== -1 ? p.splice(i, 1)[0].name : null;
+    const findQualified = (keys, p) => {
+        let i = p.findIndex(x => keys.some(k => isTrue(x[k])));
+        return i !== -1 ? p.splice(i, 1)[0].fulldisplayname : null;
     };
 
+    const findMA = (fs, p) => {
+        const h = { "B": ["B", "C1", "C"], "C1": ["C1", "C"], "C": ["C"] };
+        let i = p.findIndex(x => isTrue(x.ma) && h[fs || "B"].includes(x.fs));
+        return i !== -1 ? p.splice(i, 1)[0].fulldisplayname : null;
+    };
+
+    // PHASE 1: Kader
     aktiveFahrzeuge.forEach(fz => {
-        ergebnis[fz.id] = {};
+        ergebnis[fz.name] = {};
         fz.slots.forEach(rolle => {
-            // Führung & Maschinist (immer gleich)
-            if (["GF", "Staffelführer", "Zugführer"].includes(rolle)) ergebnis[fz.id][rolle] = findPerson("zf", pool) || findPerson("gf", pool) || findPerson("tf", pool) || "---";
-            if (rolle === "MA" || rolle === "Maschinist") ergebnis[fz.id][rolle] = findMA(fz.minFS, pool) || "<span class='warn'>Fahrer fehlt</span>";
-            
-            // Trupps (Modus-abhängig)
-            if (!ergebnis[fz.id][rolle]) {
-                if (currentMode === 'brand' && (rolle.includes("AT") || rolle.includes("WT"))) {
-                    ergebnis[fz.id][rolle] = findPerson("agt", pool) || "<span class='warn'>Kein AGT</span>";
+            const r = rolle.toUpperCase();
+            if (r === "ZF" || r === "ZUGFÜHRER") {
+                ergebnis[fz.name][rolle] = findQualified(["zf"], pool) || "<span class='warn'>Kein ZF</span>";
+            } else if (r === "GF" || r === "GRUPPENFÜHRER") {
+                ergebnis[fz.name][rolle] = findQualified(["zf", "gf"], pool) || "<span class='warn'>Kein GF</span>";
+            } else if (r === "MA" || r === "MASCHINIST") {
+                ergebnis[fz.name][rolle] = findMA(fz.minFS, pool) || "<span class='warn'>Fahrer fehlt</span>";
+            }
+        });
+    });
+
+    // PHASE 2: ME, P-Rollen und Trupps
+    aktiveFahrzeuge.forEach(fz => {
+        fz.slots.forEach(rolle => {
+            if (!ergebnis[fz.name][rolle]) {
+                const r = rolle.toUpperCase();
+                if (currentMode === 'brand' && (r.includes("AT") || r.includes("WT"))) {
+                    ergebnis[fz.name][rolle] = findQualified(["agt"], pool) || "<span class='warn'>Kein AGT</span>";
                 } else {
-                    // Im THL Modus oder für sonstige Rollen einfach der Nächste im Pool
-                    ergebnis[fz.id][rolle] = pool.length > 0 ? pool.splice(0,1)[0].name : "---";
+                    ergebnis[fz.name][rolle] = pool.length > 0 ? pool.splice(0,1)[0].fulldisplayname : "---";
                 }
             }
         });
     });
 
+    aktuellesErgebnis = ergebnis;
+
     aktiveFahrzeuge.forEach(fz => {
         let html = `<div class="vehicle"><h2>${fz.name}</h2>`;
-        fz.slots.forEach(r => html += `<div class="role"><b>${r}</b> <span>${ergebnis[fz.id][r]}</span></div>`);
+        fz.slots.forEach(r => html += `<div class="role"><b>${r}</b> <span>${ergebnis[fz.name][r]}</span></div>`);
         anzeige.innerHTML += html + "</div>";
     });
     document.getElementById('saveBtn').style.display = "block";
 }
 
 async function speichereUebung() {
-    const selected = [];
-    document.querySelectorAll('#checkliste input:checked').forEach(cb => {
-        selected.push(mannschaft[cb.getAttribute('data-idx')].name);
-    });
-    if (!confirm(`${selected.length} Personen speichern?`)) return;
+    const assignments = [];
+    for (const fz in aktuellesErgebnis) {
+        for (const rolle in aktuellesErgebnis[fz]) {
+            const dispName = aktuellesErgebnis[fz][rolle];
+            const person = mannschaft.find(m => m.fulldisplayname === dispName);
+            if (person) {
+                assignments.push({ firstName: person.name, role: rolle, mode: currentMode });
+            }
+        }
+    }
+    if (assignments.length === 0) return;
     try {
-        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ selectedNames: selected }) });
-        alert("Gespeichert!"); location.reload();
+        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ assignments: assignments }) });
+        alert("Daten gespeichert!"); 
+        location.reload();
     } catch (e) { alert("Fehler!"); }
 }
-
 ladeDaten();
 </script>
 </body>
