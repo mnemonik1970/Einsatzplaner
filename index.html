@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FFW Niedernhall | Einsatzplaner</title>
+    <title>FFW Niedernhall | Übungsplaner</title>
     <style>
         :root { --fire: #c0392b; --thl: #2980b9; --dark: #2c3e50; --bg: #f4f7f6; --accent: #e67e22; --success: #27ae60; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
@@ -261,19 +261,50 @@ function verteileMannschaft() {
 
 async function speichereUebung() {
     const assignments = [];
+    const saveBtn = document.getElementById('saveBtn'); // Button-Referenz
+
+    // 1. Button deaktivieren und Optik anpassen
+    saveBtn.disabled = true;
+    saveBtn.innerText = "⏳ Speichere...";
+    saveBtn.style.opacity = "0.5";
+    saveBtn.style.cursor = "not-allowed";
+
     for (const fz in aktuellesErgebnis) {
         for (const rolle in aktuellesErgebnis[fz]) {
             const dispName = aktuellesErgebnis[fz][rolle];
             const person = mannschaft.find(m => m.fulldisplayname === dispName);
-            if (person) assignments.push({ firstName: person.name, role: rolle, mode: currentMode });
+            if (person) {
+                assignments.push({ firstName: person.name, role: rolle, mode: currentMode });
+            }
         }
     }
-    if (assignments.length === 0) return;
+
+    if (assignments.length === 0) {
+        // Falls nichts zu speichern ist, Button wieder zurücksetzen
+        saveBtn.disabled = false;
+        saveBtn.innerText = "💾 Speichern";
+        saveBtn.style.opacity = "1";
+        saveBtn.style.cursor = "pointer";
+        return;
+    }
+
     try {
-        await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ assignments: assignments }) });
-        alert("Daten für FFW Niedernhall gespeichert!"); 
-        location.reload();
-    } catch (e) { alert("Fehler beim Speichern!"); }
+        await fetch(scriptURL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify({ assignments: assignments }) 
+        });
+        
+        alert("Daten für FFW Niedernhall erfolgreich gespeichert!"); 
+        location.reload(); // Seite neu laden setzt alles zurück
+    } catch (e) { 
+        alert("Fehler beim Speichern!"); 
+        // Im Fehlerfall Button wieder freigeben
+        saveBtn.disabled = false;
+        saveBtn.innerText = "💾 Speichern";
+        saveBtn.style.opacity = "1";
+        saveBtn.style.cursor = "pointer";
+    }
 }
 ladeDaten();
 </script>
